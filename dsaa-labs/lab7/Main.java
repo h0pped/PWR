@@ -1,0 +1,888 @@
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+interface IWithName {
+    String getName();
+}
+
+interface IList<E> extends Iterable<E> {
+    boolean add(E e); // add element to the list on proper position
+
+    void add(int index, E element) throws NoSuchElementException; // not implemented
+
+    void clear(); // delete all elements
+
+    boolean contains(E element); // is list containing an element (equals())
+
+    E get(int index) throws NoSuchElementException; //get element from position
+
+    E set(int index, E element) throws NoSuchElementException; // not implemented
+
+    int indexOf(E element); // where is element (equals())
+
+    boolean isEmpty();
+
+    Iterator<E> iterator();
+
+    ListIterator<E> listIterator() throws UnsupportedOperationException; // for ListIterator
+
+    E remove(int index) throws NoSuchElementException; // remove element from position index
+
+    boolean remove(E e); // remove element
+
+    int size();
+}
+
+
+class HashTable<E> {
+    LinkedList arr[]; // use pure array
+    private final static int defaultInitSize = 8;
+    private final static double defaultMaxLoadFactor = 0.7;
+    private int size;
+    private int element_count = 0;
+    private final double maxLoadFactor;
+
+
+    public HashTable() {
+        this(defaultInitSize);
+    }
+
+    public HashTable(int size) {
+        this(size, defaultMaxLoadFactor);
+    }
+
+
+    public HashTable(int initCapacity, double maxLF) {
+        //TODO
+        this.size = initCapacity;
+        this.maxLoadFactor = maxLF;
+        this.arr = new LinkedList[size];
+        for (int i = 0; i < size; i++) {
+            arr[i] = new LinkedList<E>();
+            Random r = new Random();
+        }
+    }
+
+    public boolean add(Object elem) {
+        int k = elem.hashCode() % size;
+        if(k<0){
+            k+=size;
+        }
+        if (arr[k].contains(elem)) return false;
+        else {
+            arr[k].add(elem);
+            element_count++;
+            if (element_count > (double) size * maxLoadFactor) {
+                doubleArray();
+            }
+            return true;
+        }
+    }
+
+
+    private void doubleArray() {
+        size = size * 2;
+        element_count = 0;
+        LinkedList[] tmp = arr;
+        arr = new LinkedList[size];
+        for (int i = 0; i < size; i++) {
+            arr[i] = new LinkedList<E>();
+        }
+            for (LinkedList x : tmp) {
+                for (Object obj : x) {
+                    add(obj);
+                }
+            }
+        }
+
+
+
+    @Override
+    public String toString() {
+
+        String string = "";
+        for (int x = 0; x < size; x++) {
+            string += x + ":";
+            Iterator it = arr[x].iterator();
+            if (it.hasNext()) {
+                string += " " + ((Document) it.next()).getName();
+                while (it.hasNext()) string += ", " + ((Document) it.next()).getName();
+            }
+            string += "\n";
+        }
+        return string;
+        //TODO
+        // use	IWithName x=(IWithName)elem;
+    }
+
+    public Object get(Object toFind) {
+        int key = toFind.hashCode() % size;
+        for (Object x : arr[key]) if (x.equals(toFind)) return x;
+        return null;
+    }
+
+}
+
+class TwoWayCycledOrderedListWithSentinel<E> implements IList<E> {
+
+    private class Element {
+        public Element(E e) {
+            object = e;
+        }
+
+        public Element(E e, Element next, Element prev) {
+            object = e;
+            this.next = next;
+            this.prev = prev;
+        }
+
+        public E getValue() {
+            return object;
+        }
+
+        public void setNext(Element elem) {
+            next = elem;
+
+        }
+
+        // add element e after this
+        public void addAfter(Element elem) {
+            // E actE = object;
+
+        }
+
+        public Element getNext() {
+            return next;
+        }
+
+        public Element getPrevious() {
+            return prev;
+        }
+
+        // assert it is NOT a sentinel
+        public void remove() {
+            if (object != sentinel) {
+                prev.next = next;
+            }
+        }
+
+        E object;
+        Element next = null;
+        Element prev = null;
+    }
+
+
+    Element sentinel;
+    int size;
+
+    private class InnerIterator implements Iterator<E> {
+        Element actElem;
+
+        //TODO
+        public InnerIterator() {
+            actElem = sentinel;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return actElem.next != sentinel;
+        }
+
+        @Override
+        public E next() {
+            E value = actElem.getNext().getValue();
+            actElem = actElem.getNext();
+            return value;
+        }
+    }
+
+    private class InnerListIterator implements ListIterator<E> {
+        Element actElem;
+
+        public InnerListIterator() {
+            actElem = sentinel;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return actElem.next != sentinel;
+        }
+
+        @Override
+        public E next() {
+            E value = actElem.getValue();
+            actElem = actElem.getNext();
+            return value;
+        }
+
+        @Override
+        public void add(E arg0) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return actElem.prev != sentinel;
+        }
+
+        @Override
+        public int nextIndex() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public E previous() {
+            E e = actElem.prev.getValue();
+            actElem = actElem.getPrevious();
+            return e;
+        }
+
+        @Override
+        public int previousIndex() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(E arg0) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public TwoWayCycledOrderedListWithSentinel() {
+        sentinel = new Element(null);
+        sentinel.object = null;
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+    }
+
+    //@SuppressWarnings("unchecked")
+    @Override
+    public boolean add(E e) {
+        if (isEmpty()) {
+            Element newElem = new Element(e);
+            newElem.setNext(sentinel);
+            newElem.prev = sentinel;
+            sentinel.setNext(newElem);
+            sentinel.prev = newElem;
+            return true;
+        } else {
+            Element actelem = sentinel;
+            while (actelem.getNext() != sentinel) {
+                if (actelem.getNext().getValue() instanceof Link) {
+                    if (((Link) actelem.getNext().getValue()).compareTo((Link) e) > 0) {
+                        break;
+                    }
+                }
+                actelem = actelem.getNext();
+            }
+            Element newElem = new Element(e);
+            newElem.prev = actelem;
+            newElem.setNext(actelem.getNext());
+            actelem.setNext(newElem);
+            newElem.getNext().prev = newElem;
+            return true;
+        }
+    }
+
+    private Element getElement(int index) {
+        if (index < 0) throw new IndexOutOfBoundsException();
+        Element actElem = sentinel;
+        while (index > 0 && actElem.getNext() != sentinel) {
+            index--;
+            actElem = actElem.getNext();
+        }
+        if (actElem == sentinel)
+            throw new IndexOutOfBoundsException();
+        return actElem;
+    }
+
+    private Element getElement(E obj) {
+        Element actElem = sentinel;
+        while (actElem.getNext() != sentinel) {
+            if (actElem.getValue().equals(obj)) {
+                return actElem;
+            } else {
+                actElem = actElem.getNext();
+            }
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public void add(int index, E element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+    }
+
+    @Override
+    public boolean contains(E element) {
+        Element actElem = sentinel;
+        while (actElem.getNext() != sentinel) {
+            if (actElem.getNext().object.equals(element)) {
+                return true;
+            } else {
+                actElem = actElem.getNext();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public E get(int index) {
+        return getElement(index + 1).getValue();
+    }
+
+    @Override
+    public E set(int index, E element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int indexOf(E element) {
+        int pos = 0;
+        Element actElem = sentinel;
+        while (actElem.getNext() != sentinel) {
+            if (actElem.getValue().equals(element))
+                return pos;
+            pos++;
+            actElem = actElem.getNext();
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return (sentinel.next == sentinel);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new InnerIterator();
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return new InnerListIterator();
+    }
+
+    @Override
+    public E remove(int index) {
+        if (index < 0 || sentinel.getNext() == sentinel) throw new IndexOutOfBoundsException();
+        if (index == 0) {
+            E retValue = sentinel.getNext().getValue();
+            sentinel.next = sentinel.getNext().getNext();
+            return retValue;
+        }
+        if (index == size() - 1) {
+            Element tail = this.getElement(size() - 1);
+            E retValue = tail.getValue();
+            tail = tail.prev;
+            tail.next = sentinel;
+            return retValue;
+        }
+        Element actElem = getElement(index);
+        if (actElem.getNext() == null)
+            throw new IndexOutOfBoundsException();
+        E retValue = actElem.getNext().getValue();
+        actElem.setNext(actElem.getNext().getNext());
+        actElem.getNext().prev = actElem;
+        return retValue;
+    }
+
+    @Override
+    public boolean remove(E e) {
+        if (sentinel.next == sentinel)
+            return false;
+        if (sentinel.next.getValue().equals(e)) {
+            sentinel.next = sentinel.next.getNext();
+            sentinel.next.prev = sentinel;
+            return true;
+        }
+        Element actElem = sentinel.next;
+        while (actElem.getNext() != sentinel && !actElem.getNext().getValue().equals(e))
+            actElem = actElem.getNext();
+
+        if (actElem.getNext() == sentinel)
+            return false;
+        if (actElem.getNext() == getElement(size() - 1)) {
+            Element tail = getElement(size() - 1);
+            tail = actElem;
+            tail.next = null;
+            return true;
+        }
+        actElem.setNext(actElem.getNext().getNext());
+        actElem.getNext().prev = actElem;
+        return true;
+    }
+
+    @Override
+    public int size() {
+        if (sentinel.next == sentinel) {
+            return 0;
+        }
+        Element actElem = sentinel.next;
+        int size = 0;
+        while (actElem != sentinel) {
+            size++;
+            actElem = actElem.getNext();
+        }
+        return size;
+    }
+
+    //@SuppressWarnings("unchecked")
+    public void add(TwoWayCycledOrderedListWithSentinel<E> other) {
+        if (other != this) {
+            for (E e : other) {
+                this.add(e);
+            }
+            other.clear();
+        }
+    }
+
+    public void removeAll(E e) {
+        while (this.contains(e)) {
+            remove(e);
+        }
+    }
+
+}
+
+
+class Document implements IWithName {
+    TwoWayCycledOrderedListWithSentinel<Link> link = new TwoWayCycledOrderedListWithSentinel<Link>();
+    String name;
+    int hash;
+
+    public Document(String name, Scanner scan) {
+        this.name = name;
+        loadDocument(scan);
+        hash = this.hashCode();
+    }
+
+    public Document(String name) {
+
+        this.name = name.toLowerCase();
+        link = new TwoWayCycledOrderedListWithSentinel<Link>();
+        hash = this.hashCode();
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        int hash = 0;
+        TwoWayCycledOrderedListWithSentinel<Integer> sequence = new TwoWayCycledOrderedListWithSentinel<Integer>();
+        sequence.add(7);
+        sequence.add(11);
+        sequence.add(13);
+        sequence.add(17);
+        sequence.add(19);
+        int sequence_counter = 0;
+        if (name.length() > 1) {
+            hash = name.charAt(0);
+            for (int i = 1; i < name.length(); i++) {
+
+                int symb = name.charAt(i);
+                int s = sequence.get(sequence_counter);
+                hash = hash * s + symb;
+                sequence_counter++;
+                if (sequence_counter == 5) {
+                    sequence_counter = 0;
+                }
+
+
+            }
+        } else {
+            hash = name.charAt(0);
+        }
+
+        return hash;
+    }
+
+    public void loadDocument(Scanner scan) {
+
+        Pattern pat = Pattern.compile("[L|l][I|i][N|n][K|k]=([a-z-A-Z][a-zA-Z_]*\\b)((\\(([^\\(]*)\\))|(?!\\())");
+        Pattern eodPat = Pattern.compile("(.*)[E|e][O|o][D|d]");
+        boolean end = true;
+        while (end == true) {
+            String actStr = scan.nextLine();
+            Matcher checkEOD = eodPat.matcher(actStr);
+            if (checkEOD.find()) {
+                end = false;
+                Matcher matcher = pat.matcher(checkEOD.group(0));
+                while (matcher.find()) {
+                    try {
+                        link.add(new Link(matcher.group(1).toLowerCase(), matcher.group(4)));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            } else {
+                Matcher matcher = pat.matcher(actStr);
+
+                while (matcher.find()) {
+                    try {
+                        link.add(new Link(matcher.group(1).toLowerCase(), matcher.group(4)));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+        }
+    }
+
+    public int[] getWeights() {
+        int[] arr = new int[link.size()];
+        for (int i = 0; i < link.size(); i++) {
+            arr[i] = link.get(i).weight;
+        }
+        return arr;
+    }
+
+    public static void showArray(int[] arr) {
+        if (arr.length > 0) {
+            System.out.print(arr[0]);
+            for (int i = 1; i < arr.length; i++)
+                System.out.print(" " + arr[i]);
+        }
+        System.out.println();
+    }
+
+    public void bubbleSort(int[] arr) {
+        showArray(arr);
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = arr.length - 1; j > 0; j--) {
+                if (arr[j - 1] > arr[j]) {
+                    swap(arr, j - 1, j);
+                }
+            }
+            showArray(arr);
+
+        }
+    }
+
+    public void insertSort(int[] arr) {
+        showArray(arr);
+        for (int i = arr.length - 2; i >= 0; i--) {
+            int val = arr[i];
+            int j = i + 1; //next elem;
+            while (j < arr.length && val > arr[j]) {
+                arr[j - 1] = arr[j];
+                j++;
+            }
+            arr[j - 1] = val;
+            showArray(arr);
+        }
+    }
+
+    public void selectSort(int[] arr) {
+        showArray(arr);
+        for (int i = arr.length; i > 1; i--) {
+            int maxpos = 0;
+            for (int j = 0; j < i; j++) {
+                if (arr[maxpos] < arr[j]) {
+                    maxpos = j;
+                }
+            }
+            swap(arr, i - 1, maxpos);
+            showArray(arr);
+        }
+
+    }
+
+    private void swap(int[] arr, int j, int k) {
+        int temp = arr[j];
+        arr[j] = arr[k];
+        arr[k] = temp;
+    }
+
+
+    public String toString() {
+        String buffer = "Document: " + name;
+        if (!link.isEmpty()) {
+            buffer += "\n";
+            Iterator iter = link.iterator();
+            while (iter.hasNext()) {
+                for (int i = 0; i < 10; i++) {
+                    if (iter.hasNext()) {
+                        buffer += iter.next();
+                        if (i != 9 && iter.hasNext()) {
+                            buffer += " ";
+                        }
+                    }
+                }
+                if (iter.hasNext()) {
+                    buffer += "\n";
+                }
+            }
+        }
+        return buffer;
+    }
+
+    public String toStringReverse() {
+        String buffer = "Document: " + name;
+        if (!link.isEmpty()) {
+            buffer += "\n";
+            ListIterator iter = link.listIterator();
+            while (iter.hasPrevious()) {
+                for (int i = 0; i < 10; i++) {
+                    if (iter.hasPrevious()) {
+                        buffer += iter.previous();
+                        if (i != 9 && iter.hasPrevious()) {
+                            buffer += " ";
+                        }
+                    }
+                }
+                if (iter.hasPrevious()) {
+                    buffer += "\n";
+                }
+            }
+        }
+        return buffer;
+    }
+
+    public boolean addLink(Link added) {
+        return link.add(added);
+    }
+
+    public static Link createLink(String link) {
+        return new Link(link);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+
+        return other instanceof Document && name.contentEquals(((Document) other).name);
+
+    }
+
+}
+
+class Link implements Comparable {
+    public String ref;
+    public int weight;
+
+    public Link(String ref) {
+        this.ref = ref;
+        this.weight = 1;
+    }
+
+    public Link(String ref, String weight) {
+        this.ref = ref;
+        if (weight == null) {
+            this.weight = 1;
+        } else if (Integer.parseInt(weight) < 0) {
+            throw new NumberFormatException();
+        } else {
+            this.weight = Integer.parseInt(weight);
+        }
+
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Link l = (Link) obj;
+        return ref.compareTo(l.ref) == 0;
+    }
+
+    @Override
+    public int compareTo(Object obj) {
+        Link l = (Link) obj;
+        return this.ref.toLowerCase().compareTo(l.ref.toLowerCase());
+    }
+
+    public String toString() {
+        return ref + "(" + weight + ")";
+    }
+}
+
+public class Main {
+
+
+    static Scanner scan; // for input stream
+
+
+    public static void main(String[] args) {
+        System.out.println("START");
+        scan = new Scanner(System.in);
+        HashTable hashTable = new HashTable(8);
+        //TwoWayCycledOrderedListWithSentinel<Document> hashTable = new TwoWayCycledOrderedListWithSentinel<Document>();
+        Document currentDoc = null;
+        boolean halt = false;
+        while (!halt) {
+                String line = scan.nextLine();
+                // empty line and comment line - read next line
+                if (line.length() == 0 || line.charAt(0) == '#')
+                    continue;
+                // copy line to output (it is easier to find a place of a mistake)
+                System.out.println("!" + line);
+                String word[] = line.split(" ");
+                //shgetdoc name - change document to name
+                if (word[0].equalsIgnoreCase("getdoc") && word.length == 2) {
+                    currentDoc = (Document) hashTable.get(new Document(word[1]));
+                    continue;
+                }
+
+                // ld documentName
+                if (word[0].equalsIgnoreCase("ld") && word.length == 2) {
+                    Pattern pat = Pattern.compile("^([a-z-A-Z][a-zA-Z_0-9]*\\b)$");
+                    Matcher matcher = pat.matcher(word[1]);
+                    if (matcher.find()) {
+                        currentDoc = new Document(word[1], scan);
+                        if (!hashTable.add(currentDoc))
+                            System.out.println("error");
+                    } else
+                        System.out.println("incorrect ID");
+                    continue;
+                }
+                // ha
+                if (word[0].equalsIgnoreCase("ha") && word.length == 1) {
+                    halt = true;
+                    continue;
+                }
+                // clear
+                if (word[0].equalsIgnoreCase("clear") && word.length == 1) {
+                    if (currentDoc != null)
+                        currentDoc.link.clear();
+                    else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // show
+                if (word[0].equalsIgnoreCase("show") && word.length == 1) {
+                    if (currentDoc != null)
+                        System.out.println(currentDoc.toString());
+                    else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // reverse
+                if (word[0].equalsIgnoreCase("reverse") && word.length == 1) {
+                    if (currentDoc != null)
+                        System.out.println(currentDoc.toStringReverse());
+                    else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // size
+                if (word[0].equalsIgnoreCase("size") && word.length == 1) {
+                    if (currentDoc != null)
+                        System.out.println(currentDoc.link.size());
+                    else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // add str
+                if (word[0].equalsIgnoreCase("add") && word.length == 2) {
+                    if (currentDoc != null) {
+                        Pattern pat = Pattern.compile("([a-z-A-Z][  a-zA-Z_]*\\b)((\\(([^\\(]*)\\))|(?!\\())");
+                        Matcher matcher = pat.matcher(word[1]);
+                        if (matcher.find()) {
+                            if (matcher.groupCount() == 4) {
+                                Link link = new Link(matcher.group(1), matcher.group(4));
+                                System.out.println(currentDoc.link.add(link));
+                            } else {
+                                Link link = new Link(matcher.group(1), matcher.group(4));
+                                System.out.println(currentDoc.link.add(link));
+                            }
+                        } else {
+                            System.out.println("error");
+                        }
+                    } else {
+                        System.out.println("no current document");
+                    }
+                    continue;
+                /*if (currentDoc != null) {
+                    Link link = Document.createLink(word[1]);
+                    if (link == null)
+                        System.out.println("error");
+                    else
+                        System.out.println(currentDoc.link.add(link));
+                } else
+                    System.out.println("no current document");
+                continue;*/
+                }
+                // get index
+                if (word[0].equalsIgnoreCase("get") && word.length == 2) {
+                    if (currentDoc != null) {
+                        int index = Integer.parseInt(word[1]);
+                        try {
+                            Link l = currentDoc.link.get(index);
+                            System.out.println(l.ref);
+                        } catch (NoSuchElementException e) {
+                            System.out.println("error");
+                        }
+                    } else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // index str
+                if (word[0].equalsIgnoreCase("index") && word.length == 2) {
+                    if (currentDoc != null) {
+                        int index = currentDoc.link.indexOf(new Link(word[1]));
+                        System.out.println(index);
+                    } else
+                        System.out.println("no current document");
+
+                    continue;
+                }
+                // remi index
+                if (word[0].equalsIgnoreCase("remi") && word.length == 2) {
+                    if (currentDoc != null) {
+                        int index = Integer.parseInt(word[1]);
+                        try {
+                            Link l = currentDoc.link.remove(index);
+                            System.out.println(l);
+                        } catch (NoSuchElementException e) {
+                            System.out.println("error");
+                        }
+                    } else
+                        System.out.println("no current document");
+
+                    continue;
+                }
+                // rem str
+                if (word[0].equalsIgnoreCase("rem") && word.length == 2) {
+                    if (currentDoc != null) {
+                        System.out.println(currentDoc.link.remove(new Link(word[1])));
+                    } else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // remall str
+                if (word[0].equalsIgnoreCase("remall") && word.length == 2) {
+                    if (currentDoc != null) {
+                        currentDoc.link.removeAll(new Link(word[1]));
+                    } else
+                        System.out.println("no current document");
+                    continue;
+                }
+                // ht - show hashtable
+                if (word[0].equalsIgnoreCase("ht") && word.length == 1) {
+                    System.out.print(hashTable.toString());
+                    continue;
+                }
+                System.out.println("Wrong command");
+
+            }
+
+        System.out.println("END OF EXECUTION");
+        scan.close();
+
+    }
+}
