@@ -1,0 +1,3 @@
+﻿  CNode.cpp
+C:\Users\zanuda\source\repos\CNode\CNode\CNode.cpp(169,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
+  CNode.vcxproj -> C:\Users\zanuda\source\repos\CNode\Debug\CNode.exe
