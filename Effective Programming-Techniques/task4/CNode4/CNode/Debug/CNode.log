@@ -1,0 +1,35 @@
+﻿  CNode.cpp
+C:\Users\break\Desktop\CNode4\CNode\CNodeDynamic.h(24,20): warning C4018: '>=': signed/unsigned mismatch
+C:\Users\break\Desktop\CNode4\CNode\CNodeDynamic.h(22): message : while compiling class template member function 'CNodeDynamic<T> *CNodeDynamic<T>::pcGetChild(int)'
+          with
+          [
+              T=std::string
+          ]
+C:\Users\break\Desktop\CNode4\CNode\CNode.cpp(32): message : see reference to function template instantiation 'CNodeDynamic<T> *CNodeDynamic<T>::pcGetChild(int)' being compiled
+          with
+          [
+              T=std::string
+          ]
+C:\Users\break\Desktop\CNode4\CNode\CNode.cpp(29): message : see reference to class template instantiation 'CNodeDynamic<T>' being compiled
+          with
+          [
+              T=std::string
+          ]
+C:\Users\break\Desktop\CNode4\CNode\CNodeDynamic.h(31,2): warning C4018: '<': signed/unsigned mismatch
+C:\Users\break\Desktop\CNode4\CNode\CNodeDynamic.h(29): message : while compiling class template member function 'void CNodeDynamic<T>::vPrintAllBelow(void)'
+          with
+          [
+              T=std::string
+          ]
+C:\Users\break\Desktop\CNode4\CNode\CTreeDynamic.h(14): message : see reference to function template instantiation 'void CNodeDynamic<T>::vPrintAllBelow(void)' being compiled
+          with
+          [
+              T=std::string
+          ]
+  CTreeDynamic.cpp
+  CTreeStatic.cpp
+  СNodeStatic.cpp
+C:\Users\break\Desktop\CNode4\CNode\СNodeStatic.cpp(8,23): warning C4018: '>=': signed/unsigned mismatch
+C:\Users\break\Desktop\CNode4\CNode\СNodeStatic.cpp(34,22): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  CNode.vcxproj -> C:\Users\break\Desktop\CNode4\Debug\CNode.exe

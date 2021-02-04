@@ -1,2 +1,0 @@
-C:\Users\zanuda\Desktop\Hello world\Debug\Hello world.exe
-C:\Users\zanuda\Desktop\Hello world\Debug\Hello world.pdb
