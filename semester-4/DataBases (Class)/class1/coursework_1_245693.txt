@@ -1,0 +1,27 @@
+#1
+
+https://lucid.app/lucidchart/invitations/accept/46a39075-9caa-48aa-b555-c2016106744e
+
+Homeowners association consists of apartment owners
+Apartment owners have apartaments (apartaments have owners)
+Homeowners association has parking lot
+1 Parking lot has  many parking spaces 
+parking spaces can have a their number, is it available for now and if not - car rented number
+
+parking spaces can be of two types: default and with electric sockets
+apartaments should stay queue for the electric socket parking space
+one apartament can have only 1 electric socket parking space at the moment
+
+if space is free - the apartment with the longest queue time may rent it
+One of the apartment owners must sign the contract for this space
+Contract contains info about owner and a parking slot 
+After contract price of electric sockets parking is added to apartament rent price
+
+Parking lot may have scrap cars
+Scrap cars have their discovery
+
+
+#2
+https://lucid.app/lucidchart/invitations/accept/c5e6183a-99e3-45d7-858f-6eae32a77902
+
+

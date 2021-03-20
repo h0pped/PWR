@@ -1,0 +1,7 @@
+/index.html 200 343 2
+/delete/product/3 404 0 1
+/get/products/4 201 43434 6
+       
+/about.html 200 34443 2
+
+/add/products/a2w 500 0 2
