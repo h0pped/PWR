@@ -1,0 +1,50 @@
+-- $ProjectHeader: use 0.393 Wed, 16 May 2007 14:10:28 +0200 opti $
+
+model Software
+
+-- classes
+
+class Account
+attributes
+  email : String
+  password : String
+end
+
+class Order
+attributes
+	date : String
+	sumPrice : Integer
+	owner : Account
+end
+
+class Product
+attributes
+	name : String
+	price : Integer
+end
+-- associations	
+
+association AssignedTo between
+  Account[1]
+  Order[*]
+end
+
+association Assigned between
+  Order[1]
+  Product[*]
+end
+
+-- OCL constraints
+
+constraints
+
+context Account
+	--password contain non empty password which contains at least 1 digit and 1 special character ($ # @)
+	inv PasswordValidation:
+		self.password.size() > 1
+
+		
+context Product
+	--Product price must be greater than zero
+	inv PriceValidation:
+		self.price > 0 

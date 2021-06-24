@@ -1,0 +1,7 @@
+{
+  "log_filename": "logs.txt",
+  "request_method": "GET",
+  "logging_level": "INFO",
+  "displayed_at_once": "5",
+  "ignore_code": "200"
+}
